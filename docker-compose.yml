@@ -1,0 +1,124 @@
+version: '3'
+
+networks:
+  net-insegura:           #Super ceativo ja
+    external: false
+
+services:
+  gitserver:
+    image: gitea/gitea
+    container_name: gitserver
+    restart: unless-stopped
+    expose:
+      - "3000" # HTTP
+      - "5022" # SSH
+    ports:    # se deben sacar esta linea y la siguiente
+    - "127.0.0.1:3000:3000"
+    volumes:
+      - ./gitea/datalib:/var/lib/gitea
+      - ./gitea/dataetc:/etc/gitea
+      - ./gitea/datalog:/data/gitea/log
+      - ./gitea/datarepo:/data/git/repositories
+      - ./gitea/datadb:/data/gitea/gitea.db
+
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+#      - ./gitserver/repositories.json:/tmp/repositories.json:ro
+#      - ./gitserver/id_training-pipeline-sample:/tmp/id_training-pipeline-sample
+    environment:
+      - EXTERNAL_URL=http://${EXTERNAL_DOMAIN}:${EXTERNAL_PORT}/gitserver
+      - EXTERNAL_DOMAIN=${EXTERNAL_DOMAIN}
+      - FIRST_USER=${DEV_USER}
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=gitserver-db:5432
+      - GITEA__database__NAME=${GITEA_DBNAME}
+      - GITEA__database__USER=${GITEA_ADMIN}
+      - GITEA__database__PASSWD=${GITEA_PASS}
+#      - LOAD_SSH_KEY_FROM_JENKINS=true # Autoload the BlueOcean SSH Key into Gitea
+#      - SOURCE_REPO_CONFIG=/tmp/repositories.json
+    networks:
+      - net-insegura
+ 
+ 
+
+
+  jdk11-ssh-agent:          # Agente para compilar con java 8
+    image: pcanesta/studein-jdk11-agent:2.1
+    container_name: jdk11-ssh-agent
+    restart: unless-stopped
+    privileged: true
+    expose:
+      - "22" # SSH
+    extra_hosts:
+      - "${EXTERNAL_DOMAIN}:${DOCKER_BRIDGE_IP}"
+    networks:
+      - net-insegura
+    environment:
+      - START_DOCKER=yes
+#      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAA  la que se genera en jenkins
+ 
+      
+  jenkins:
+    image: jenkins/jenkins:jdk11
+    privileged: true
+    container_name: jenkins
+    restart: unless-stopped
+    
+    expose:
+      - "8080" # HTTP
+      - "50000" # JNLP
+    ports:    # se deben sacar esta linea y la siguiente recordar port es pa fuera, expose interno
+    - "127.0.0.1:8080:8080"
+    volumes: # Esto debería ser refactorizado. Sólo hay que copiar todo el directorio.
+      - ./jenkins/jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+
+    depends_on:
+#      - jdk8-ssh-agent
+      - jdk11-ssh-agent
+    extra_hosts:
+      - "${EXTERNAL_DOMAIN}:${DOCKER_BRIDGE_IP}"
+    networks:
+      - net-insegura
+    environment:
+      - JENKINS_EXTERNAL_URL=http://${EXTERNAL_DOMAIN}:${EXTERNAL_PORT}/jenkins
+      - JENKINS_OPTS=--prefix=/jenkins
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+ 
+
+  sonarqube:
+    image: sonarqube
+    restart: unless-stopped
+    expose:
+      - "9000" # HTTP
+      - "9092"
+      - "5222" # SSH    
+    ports:
+      - "127.0.0.1:9001:9000"
+      - "9092:9092"
+    networks:
+      - net-insegura
+    volumes:
+       # debes crear las carpetas para los volumenes usados de esta forma
+      - ./sonar/sonarqube-data:/opt/sonarqube/data
+      - ./sonar/sonarqube-extensions:/opt/sonarqube/extensions
+      - ./sonar/sonarqube-conf:/opt/sonarqube/conf
+      - ./sonar/sonarqube-logs:/opt/sonarqube/logs
+      - ./sonar/sonarqube-bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+# si quieres usar estos volumes, comenta los de arriba y descomenta todas las lineas que siguen
+#      - sonarqube-data:/opt/sonarqube/data
+#      - sonarqube-extensions:/opt/sonarqube/extensions
+#      - sonarqube-conf:/opt/sonarqube/conf
+#      - sonarqube-logs:/opt/sonarqube/logs
+#      - sonarqube-bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+
+#volumes:
+#  sonarqube-data:
+#  sonarqube-extensions:
+#  sonarqube-bundled-plugins:
+#  sonarqube-conf:
