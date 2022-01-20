@@ -2,7 +2,7 @@
 ## Docker Compose usando gitea jenkins y sonarqube
 
 Hacer el ciclo completo de creacion de carpetas y subida de docker compose
-
+(necesitas el .env ?) pídelo!!
 
 Despues de clonar ejecutar creacion de carpetas, es solo para orden
 
