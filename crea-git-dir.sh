@@ -2,7 +2,7 @@
 # se corre solo la primera vez o cuando quieras rehacer tu sonarqube
 # si lo vuelves a corres te quedas sin la data que habias configurado, ojo ahí..
 
-sudo rm gitea -r
+sudo rm gitea -r 2> /dev/null
 
 mkdir -p gitea/datalib
 mkdir -p gitea/dataetc
