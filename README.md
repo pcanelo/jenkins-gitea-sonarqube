@@ -1,10 +1,10 @@
 # Welcome
 ## Docker Compose usando gitea jenkins sonarqube nexus
 
-Entorno credo para hacer un ciclo completo de DevOps CI/CD.
-Gitea est usando sqllite3, sin embargo podría ser  mysql, oracle, postgres
+Entorno creado para hacer un ciclo completo de DevOps CI/CD.
+Gitea esta usando Sqllite, sin embargo podría ser  mysql, oracle, postgres
 
-Los volumenes son volumes nombrados, eso te servira por si quieres borrar otros volumenes -muchos- y quieres mantener estos, debes usar el rm con filter o usar un script con foreach para discriminarles.
+Los volumenes son volumes nombrados, eso te servirá por si quieres borrar otros volumenes y quieres mantener los de este entorno, debes usar el rm con filter o usar un script con foreach para discriminarles.
 
 Ejecutar docker compose
 ```sh
