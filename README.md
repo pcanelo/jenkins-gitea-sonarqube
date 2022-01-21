@@ -10,12 +10,10 @@ Ejecutar docker compose
 ```sh
 docker-compose up -d
 ```
-este sera el ultimo message en indica que termino la instanción de objetos 
-nexus            | -------------------------------------------------
-nexus            |
-nexus            | Started Sonatype Nexus OSS 3.37.3-02
-nexus            |
-nexus            | -------------------------------------------------
+El siguiente será el último message e indica que terminó la instanciación de objetos 
+
+#### nexus            Started Sonatype Nexus OSS 3.37.3-02
+
 
 
 
