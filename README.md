@@ -44,3 +44,10 @@ docker-compose stop
 docker-compose down
 docker volume ls --filter  name=^nombre-de-tu-carpeta
 ```
+### Script para disciminar volumenes  
+```sh
+for vl in $(docker volume list) ; do
+    echo "VOLUMNE: es $vl"
+done
+```
+poner un if y usar substr  o funcional...
