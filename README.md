@@ -1,4 +1,4 @@
-# Welcome
+# Welcome amigos mios
 ## Docker Compose usando gitea jenkins sonarqube nexus
 
 Entorno creado para hacer un ciclo completo de DevOps CI/CD.
